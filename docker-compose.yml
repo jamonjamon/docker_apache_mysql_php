@@ -1,0 +1,48 @@
+
+version: '3.3'
+
+services:
+  db:
+    image: mysql:8.0
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test_db
+      MYSQL_USER: dev
+      MYSQL_PASSWORD: secret
+
+  wordpress:
+    depends_on:
+      - db
+    links:
+      - db
+    image: php:8.0-apache
+    ports:
+      - "8000:80"
+    restart: always
+   
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html/
+    #  - /uploads.ini:usr/local/etc/php/conf.d/uploads.ini
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    ports:
+      - "1234:80"
+    links:
+      - db
+    environment:
+      PMA_HOST: mysql
+    restart: always
+
+volumes:
+  db_data: 
+#  www_html:
+
+    
+networks:
+  default:
